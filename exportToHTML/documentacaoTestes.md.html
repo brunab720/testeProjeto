@@ -1,0 +1,158 @@
+<html>
+<head>
+<title>documentacaoTestes.md</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #c77dbb; font-style: italic;}
+.s4 { color: #6aab73;}
+.s5 { color: #56a8f5;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+documentacaoTestes.md</font>
+</center></td></tr></table>
+<pre><span class="s0"># </span><span class="s2">Teste 1</span><span class="s1">: </span><span class="s2">Validar Criação de ID Único - POST</span>
+
+<span class="s0">## </span><span class="s2">Descrição</span>
+<span class="s2">Este teste tem como objetivo validar que ao criar dois usuários distintos através de requisições POST, os IDs gerados para cada usuário devem ser </span><span class="s1">**</span><span class="s2">únicos</span><span class="s1">**</span><span class="s2">.</span>
+
+<span class="s0">## </span><span class="s2">Objetivo</span>
+<span class="s2">Verificar que, ao realizar duas requisições POST para criar usuários, os IDs gerados não são iguais e, portanto, são exclusivos.</span>
+
+
+<span class="s0">## </span><span class="s2">Passos do Teste</span>
+
+<span class="s0">1. </span><span class="s1">**</span><span class="s2">Preparar a requisição 1</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Definir um nome de usuário </span><span class="s1">(</span><span class="s2">João</span><span class="s1">) </span><span class="s2">e um cargo </span><span class="s1">(&quot;</span><span class="s2">Software Engineer</span><span class="s1">&quot;)</span><span class="s2">.</span>
+    <span class="s0">- </span><span class="s2">Enviar a requisição POST para criar o usuário.</span>
+
+<span class="s0">2. </span><span class="s1">**</span><span class="s2">Preparar a requisição 2</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Definir um nome de usuário diferente </span><span class="s1">(</span><span class="s2">Bruna</span><span class="s1">) </span><span class="s2">e o mesmo cargo </span><span class="s1">(&quot;</span><span class="s2">Software Engineer</span><span class="s1">&quot;)</span><span class="s2">.</span>
+    <span class="s0">- </span><span class="s2">Enviar a requisição POST para criar o usuário.</span>
+
+<span class="s0">3. </span><span class="s1">**</span><span class="s2">Verificar os IDs gerados</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Extrair o `id` gerado para cada usuário da resposta.</span>
+
+<span class="s0">4. </span><span class="s1">**</span><span class="s2">Validação</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Verificar que os IDs gerados para João e Bruna são diferentes, garantindo que sejam IDs únicos.</span>
+
+<span class="s0">## </span><span class="s2">Implementação</span>
+
+<span class="s0">```</span><span class="s3">java</span>
+<span class="s4">@Test</span>
+<span class="s4">public void validarIDUnico() {</span>
+    <span class="s4">Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();</span>
+    
+    <span class="s4">JSONObject request1 = new JSONObject(map);</span>
+    <span class="s4">request1.put(&quot;name&quot;, &quot;João&quot;);</span>
+    <span class="s4">request1.put(&quot;job&quot;, &quot;Software Engineer&quot;);</span>
+
+    <span class="s4">baseURI = &quot;https://reqres.in/api&quot;;</span>
+    <span class="s4">Response response1 = given().</span>
+            <span class="s4">header(&quot;Content-Type&quot;, &quot;application/json&quot;).</span>
+            <span class="s4">contentType(ContentType.JSON).</span>
+            <span class="s4">body(request1).</span>
+            <span class="s4">when().</span>
+            <span class="s4">post(&quot;users&quot;).</span>
+            <span class="s4">then().</span>
+            <span class="s4">statusCode(201).</span>
+            <span class="s4">log().all().</span>
+            <span class="s4">extract().response();</span>
+    <span class="s4">JSONObject request2 = new JSONObject(map);</span>
+    <span class="s4">request2.put(&quot;name&quot;, &quot;Bruna&quot;);</span>
+    <span class="s4">request2.put(&quot;job&quot;, &quot;Software Engineer&quot;);</span>
+
+    <span class="s4">Response response2 = given().</span>
+            <span class="s4">header(&quot;Content-Type&quot;, &quot;application/json&quot;).</span>
+            <span class="s4">contentType(ContentType.JSON).</span>
+            <span class="s4">body(request2).</span>
+            <span class="s4">when().</span>
+            <span class="s4">post(&quot;users&quot;).</span>
+            <span class="s4">then().</span>
+            <span class="s4">statusCode(201).</span>
+            <span class="s4">log().all().</span>
+            <span class="s4">extract().response();</span>
+    
+    <span class="s4">String Id1 = response1.jsonPath().getString(&quot;id&quot;);</span>
+    <span class="s4">String Id2 = response2.jsonPath().getString(&quot;id&quot;);</span>
+
+    <span class="s4">// Verificação se os IDs são diferentes</span>
+    <span class="s4">assertNotEquals(Id1, Id2, &quot;Os IDs não podem ser iguais. Devem ser IDs únicos.&quot;);</span>
+<span class="s4">}</span>
+<span class="s0">```</span>
+<span class="s0"># </span><span class="s2">Teste 2</span><span class="s1">: </span><span class="s2">Validar Campos Não Nulos - GET</span>
+
+<span class="s0">## </span><span class="s2">Descrição</span>
+<span class="s2">Este teste valida que os campos </span><span class="s1">**</span><span class="s2">`first_name`</span><span class="s1">**</span><span class="s2">, </span><span class="s1">**</span><span class="s2">`last_name`</span><span class="s1">** </span><span class="s2">e </span><span class="s1">**</span><span class="s2">`email`</span><span class="s1">** </span><span class="s2">da resposta da API </span><span class="s1">**</span><span class="s2">`GET`</span><span class="s1">** </span><span class="s2">não podem ser nulos ou vazios.</span>
+
+<span class="s0">## </span><span class="s2">Objetivo</span>
+<span class="s2">Verificar que, ao fazer uma requisição </span><span class="s1">**</span><span class="s2">GET</span><span class="s1">** </span><span class="s2">à API, os campos </span><span class="s1">(</span><span class="s2">`first_name`, `last_name`, `email`</span><span class="s1">) </span><span class="s2">da resposta não sejam nulos nem vazios.</span>
+
+<span class="s0">## </span><span class="s2">Passos do Teste</span>
+
+<span class="s0">1. </span><span class="s1">**</span><span class="s2">Realizar Requisição GET</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Enviar uma requisição GET para a URL </span><span class="s1">**</span><span class="s2">`</span><span class="s5">https://reqres.in/api/users?page=2</span><span class="s2">`</span><span class="s1">**</span><span class="s2">.</span>
+
+<span class="s0">2. </span><span class="s1">**</span><span class="s2">Verificar Status da Resposta</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Confirmar que o código de status da resposta seja </span><span class="s1">**</span><span class="s2">200 </span><span class="s1">(</span><span class="s2">OK</span><span class="s1">)**</span><span class="s2">.</span>
+
+<span class="s0">3. </span><span class="s1">**</span><span class="s2">Validar Campos Não Nulos</span><span class="s1">:**</span>
+    <span class="s0">- </span><span class="s2">Extrair os valores dos campos </span><span class="s1">**</span><span class="s2">`first_name`</span><span class="s1">**</span><span class="s2">, </span><span class="s1">**</span><span class="s2">`last_name`</span><span class="s1">** </span><span class="s2">e </span><span class="s1">**</span><span class="s2">`email`</span><span class="s1">** </span><span class="s2">da resposta.</span>
+    <span class="s0">- </span><span class="s2">Verificar que </span><span class="s1">**</span><span class="s2">`first_name`</span><span class="s1">** </span><span class="s2">não seja nulo nem vazio.</span>
+    <span class="s0">- </span><span class="s2">Verificar que </span><span class="s1">**</span><span class="s2">`last_name`</span><span class="s1">** </span><span class="s2">não seja nulo nem vazio.</span>
+    <span class="s0">- </span><span class="s2">Verificar que </span><span class="s1">**</span><span class="s2">`email`</span><span class="s1">** </span><span class="s2">não seja nulo nem vazio.</span>
+
+<span class="s0">## </span><span class="s2">Implementação</span>
+
+<span class="s0">```</span><span class="s3">java</span>
+<span class="s4">package apiModules;</span>
+<span class="s4">import org.testng.Assert;</span>
+<span class="s4">import org.testng.annotations.Test;</span>
+<span class="s4">import io.restassured.response.Response;</span>
+<span class="s4">import static io.restassured.RestAssured.*;</span>
+<span class="s4">import java.util.Map;</span>
+
+<span class="s4">public class apiNulos {</span>
+
+    <span class="s4">// Validar se o campo first_name, last_name e email são não nulos/vazios - GET</span>
+
+    <span class="s4">@Test</span>
+    <span class="s4">public void validarNULOS(){</span>
+
+        <span class="s4">Response response = get(&quot;https://reqres.in/api/users?page=2&quot;);</span>
+        <span class="s4">int statusCode = response.getStatusCode();</span>
+        
+        <span class="s4">Assert.assertEquals(statusCode,200);</span>
+
+
+        <span class="s4">Map&lt;String, Object&gt; map = response.jsonPath().getMap(&quot;data[0]&quot;);</span>
+
+        <span class="s4">String firstname = (String) map.get(&quot;first_name&quot;);</span>
+        <span class="s4">Assert.assertNotNull(firstname, &quot;firstname não pode ser nulo&quot;);</span>
+        <span class="s4">Assert.assertFalse(firstname.isEmpty(), &quot;firstname não pode ser vazio&quot;);</span>
+
+        <span class="s4">String lastname = (String) map.get(&quot;last_name&quot;);</span>
+        <span class="s4">Assert.assertNotNull(lastname, &quot;last_name não pode ser nulo&quot;);</span>
+        <span class="s4">Assert.assertFalse(lastname.isEmpty(), &quot;firstname não pode ser vazio&quot;);</span>
+
+        <span class="s4">String email = (String) map.get(&quot;email&quot;);</span>
+        <span class="s4">Assert.assertNotNull(email, &quot;email não pode ser nulo&quot;);</span>
+        <span class="s4">Assert.assertFalse(email.isEmpty(), &quot;email não pode ser vazio&quot;);</span>
+
+    <span class="s4">}</span>
+
+<span class="s4">}</span>
+
+
+
+
+
+</pre>
+</body>
+</html>
